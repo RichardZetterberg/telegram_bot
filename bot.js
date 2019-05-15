@@ -4,21 +4,59 @@ const token = '843724111:AAFTJK0Jf6WKlY4EzluuX8PNe7-HBd9VCQc';
 const bot = new TelegramBot(token, {polling: true});
 
 const url = 'https://sinoptik.ua';
-//const axios = require('axios');
 const cheerio = require('cheerio');
 var needle = require("needle");
 
-bot.onText(/today/, (msg) => {
+bot.onText(/start/, (msg) => {
   needle.get(url,  function(err, res){
   if (err) throw (err);
 
   let $ = cheerio.load(res.body);
 
- // console.log($(".main #bd2").text());
-   let something  = $("#bd1 .temperature ").text();
-   console.log(something);
-    const chatId = msg.chat.id;
-  bot.sendMessage(chatId, something);
+   let message  = "Этот бот парсит информацию о погоде за три дня с сайта: 'Sinoptik'. Возможные команды: /start /today /tomorrow /next /todayDescription"
+
+   const chatId = msg.chat.id;
+
+   bot.sendMessage(chatId, message);
+  
+})
+  
+});
+
+bot.onText(/today/, (msg) => {
+  needle.get(url,  function(err, res){
+  if (err) throw (err);
+
+   let $ = cheerio.load(res.body);
+
+   let MaxMinTemperature  = $("#bd1 .temperature ").text();
+
+   const chatId = msg.chat.id;
+
+   bot.sendMessage(chatId, `Температура сегодня ${MaxMinTemperature}`);
+  
+})
+  
+});
+
+bot.onText(/todayDescription/, (msg) => {
+  needle.get(url,  function(err, res){
+  if (err) throw (err);
+
+   let $ = cheerio.load(res.body);
+
+   let description  = $(".description").text();
+   /*let description  = $(".temperature").text();
+   let description  = $(".temperatureSens").text();
+   let description  = $("tr.gray").text();*/
+
+   const chatId = msg.chat.id;
+
+   bot.sendMessage(chatId, `Описание ${description}`);
+   /*bot.sendMessage(chatId, `Температура ${temperature}`);
+   bot.sendMessage(chatId, `Как чувствуется ${temperatureSens}`);
+   bot.sendMessage(chatId, `Остальное ${tr.gray}`);*/
+  
 })
   
 });
@@ -29,13 +67,13 @@ bot.onText(/tomorrow/, (msg) => {
 
   let $ = cheerio.load(res.body);
 
- // console.log($(".main #bd2").text());
-   let something  = $("#bd2 .temperature ").text();
-   console.log(something);
+   let MaxMinTemperature  = $("#bd2 .temperature ").text();
+
+ 
     const chatId = msg.chat.id;
-  bot.sendMessage(chatId, something);
+   	bot.sendMessage(chatId, `Температура завтра ${MaxMinTemperature}`);
 })
-  
+
 });
 
 bot.onText(/next/, (msg) => {
@@ -43,12 +81,13 @@ bot.onText(/next/, (msg) => {
   if (err) throw (err);
 
   let $ = cheerio.load(res.body);
+   let MaxMinTemperature  = $("#bd3 .temperature ").text();
+ 
 
- // console.log($(".main #bd2").text());
-   let something  = $("#bd3 .temperature ").text();
-   console.log(something);
-    const chatId = msg.chat.id;
-  bot.sendMessage(chatId, something);
-})
-  
+   const chatId = msg.chat.id;
+  	bot.sendMessage(chatId, `Температура после завтра ${MaxMinTemperature}`);
+
+}) 
+
 });
+
